@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+    <title>performance.measureUserAgentSpecificMemory</title>
+  </head>
+  <body>
+    <div id="container">
+    </div>
+    <script>
+    const crossOriginTest = () => {
+      container.innerHTML += `<pre>crossOriginIsolated...</pre>`;
+
+      if (crossOriginIsolated) {
+        container.innerHTML += `<pre>true</pre>`;
+      } else {
+        container.innerHTML += `<pre>false</pre>`;
+      }
+    }
+
+    const sharedArrayTest = () => {
+      container.innerHTML += `<pre>SharedArrayBuffer allocation...</pre>`;
+
+      try {
+        const buffer = new window.SharedArrayBuffer(1024);
+        container.innerHTML += `<pre>OK</pre>`;
+      } catch (err) {
+        console.error(err);
+        container.innerHTML += `<pre>Error: ${err.message}</pre>`;
+      }
+    };
+
+    const perfMemoryTest = () => {
+      container.innerHTML += '<pre>performance.measureUserAgentSpecificMemory...<pre>';
+
+      const start = performance.now();
+      const sec = () => `${((performance.now() - start) / 1000).toFixed(2)} sec.`;
+
+      try {
+        performance.measureUserAgentSpecificMemory()
+          .then(result => {
+            const ms = performance.now() - start;
+            console.log(result);
+            container.innerHTML += `<pre>OK. took ${sec()}\n${JSON.stringify(result, null, 2)}</pre>`;
+          })
+          .catch(err => {
+            const ms = performance.now() - start;
+            console.error(err);
+            container.innerHTML += `<pre>Error. took ${sec()}\n${JSON.stringify(err, null, 2)}</pre>`;
+          });
+      } catch (funcErr) {
+        console.error(funcErr);
+        container.innerHTML += `<pre>Error: ${funcErr.message}</pre>`;
+      }
+    };
+
+    crossOriginTest();
+    sharedArrayTest();
+    perfMemoryTest();
+    </script>
+  </body>
+</html>
