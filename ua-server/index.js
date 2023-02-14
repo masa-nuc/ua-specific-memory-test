@@ -22,4 +22,12 @@ app.get('/co', (req, res) => {
   res.end();
 })
 
+app.get('/gc', (req, res) => {
+  res.header('Cross-Origin-Embedder-Policy', 'require-corp');
+  res.header('Cross-Origin-Opener-Policy', 'same-origin');
+  res.writeHead(200, {'Content-Type': 'text/html'});
+  res.write(fs.readFileSync('./gc.html'));
+  res.end();
+})
+
 server.listen(port, () => console.log(`Listening on port ${port}`));

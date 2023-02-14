@@ -1,6 +1,6 @@
 # ua-specific-memory-test
 
-Test [performance.measureUserAgentSpecificMemory](https://developer.mozilla.org/en-US/docs/Web/API/Performance/measureUserAgentSpecificMemory) API
+Test [performance.measureUserAgentSpecificMemory](https://developer.mozilla.org/en-US/docs/Web/API/Performance/measureUserAgentSpecificMemory) API for [issue37147](https://github.com/electron/electron/issues/37147) in electron
 
 ## Prepare server
 

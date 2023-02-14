@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+    <title>GC test</title>
+  </head>
+  <body>
+    <div id="container">
+    </div>
+    <script>
+    const GiB = 1024 * 1024 * 1024;
+    const arrayBuffers = [];
+    const sharedArrays = [];
+    const wasmMemories = [];
+    const wasmShared = [];
+
+    function addArrayBuffer(size = GiB) {
+      const ab = new ArrayBuffer(size);
+      const buf = new Uint8Array(ab, 0, size);
+      buf.fill(1);
+      arrayBuffers.push(buf);
+      document.getElementById("totalAB").innerText = `${arrayBuffers.length} GiB`;
+    }
+    function resetArrayBuffer() {
+      arrayBuffers.length = 0;
+      document.getElementById("totalAB").innerText = `${arrayBuffers.length} GiB`;
+    }
+
+    function addSharedArray(size = GiB) {
+      if (typeof window?.SharedArrayBuffer === 'function') {
+        const ab = new window.SharedArrayBuffer(size);
+        const buf = new Uint8Array(ab, 0, size);
+        buf.fill(1);
+        sharedArrays.push(buf);
+        document.getElementById("totalSA").innerText = `${sharedArrays.length} GiB`;
+      } else {
+        document.getElementById("totalSA").innerText = 'window.SharedArrayBuffer is not available';
+      }
+    }
+    function resetSharedArray() {
+      sharedArrays.length = 0;
+      document.getElementById("totalSA").innerText = `${sharedArrays.length} GiB`;
+    }
+
+    function addWASMMemory(size = GiB) {
+      const PAGE = size / 65536;
+      const wasm = new WebAssembly.Memory({ initial: PAGE, maximum: PAGE })
+      const buf = new Uint8Array(wasm.buffer, 0, size);
+      buf.fill(1);
+      wasmMemories.push(buf);
+      document.getElementById("totalWM").innerText = `${wasmMemories.length} GiB`;
+    }
+    function resetWASMMemory() {
+      wasmMemories.length = 0;
+      document.getElementById("totalWM").innerText = `${wasmMemories.length} GiB`;
+    }
+
+    function addWASMShared(size = GiB) {
+      const PAGE = size / 65536;
+      const wasm = new WebAssembly.Memory({ initial: PAGE, maximum: PAGE, shared: true })
+      const buf = new Uint8Array(wasm.buffer, 0, size);
+      buf.fill(1);
+      wasmShared.push(buf);
+      document.getElementById("totalWS").innerText = `${wasmShared.length} GiB`;
+    }
+    function resetWASMShared() {
+      wasmShared.length = 0;
+      document.getElementById("totalWS").innerText = `${wasmShared.length} GiB`;
+    }
+    console.log(`crossOriginIsolated: ${crossOriginIsolated}`);
+    </script>
+    <div>
+      <div>ArrayBuffer</div>
+      <div id="totalAB">0 GiB</div>
+      <div><input type="button" value="new 1GiB" onclick="addArrayBuffer()"></div>
+      <div><input type="button" value="reset" onclick="resetArrayBuffer()"></div>
+    </div>
+    <br>
+    <div>
+      <div>SharedArrayBuffer</div>
+      <div id="totalSA">0 GiB</div>
+      <div><input type="button" value="new 1GiB" onclick="addSharedArray()"></div>
+      <div><input type="button" value="reset" onclick="resetSharedArray()"></div>
+    </div>
+    <br>
+    <div>
+      <div>WASM Memory</div>
+      <div id="totalWM">0 GiB</div>
+      <div><input type="button" value="new 1GiB" onclick="addWASMMemory()"></div>
+      <div><input type="button" value="reset" onclick="resetWASMMemory()"></div>
+    </div>
+    <br>
+    <div>
+      <div>WASM Memory with shared: true</div>
+      <div id="totalWS">0 GiB</div>
+      <div><input type="button" value="new 1GiB" onclick="addWASMShared()"></div>
+      <div><input type="button" value="reset" onclick="resetWASMShared()"></div>
+    </div>
+  </body>
+</html>
